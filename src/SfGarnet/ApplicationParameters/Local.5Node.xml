@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Local 5-node Service Fabric cluster (OneBox) for testing the Cluster topology.
+  One Garnet node per SF node (InstanceCount = -1); the control plane shards all
+  16384 slots and attaches 1 replica per primary. AOF is enabled for replication.
+-->
+<Application xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Name="fabric:/SfGarnet" xmlns="http://schemas.microsoft.com/2011/01/fabric">
+  <Parameters>
+    <Parameter Name="SfGarnet_Mode" Value="Cluster" />
+    <Parameter Name="GarnetService_InstanceCount" Value="-1" />
+    <Parameter Name="GarnetService_MemorySize" Value="1g" />
+    <Parameter Name="GarnetService_EnableAof" Value="true" />
+    <Parameter Name="GarnetService_CleanClusterConfig" Value="true" />
+    <Parameter Name="ClusterManager_ReplicaCount" Value="1" />
+    <Parameter Name="ClusterManager_ReconcileIntervalSeconds" Value="15" />
+  </Parameters>
+</Application>

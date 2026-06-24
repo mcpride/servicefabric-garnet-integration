@@ -1,0 +1,13 @@
+## .NET / build output
+bin/
+obj/
+*.user
+
+## Service Fabric package output
+**/pkg/
+*.sfpkg
+
+## Rider/VS
+.vs/
+.idea/
+/src/packages

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Settings xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xmlns="http://schemas.microsoft.com/2011/01/fabric">
+
+  <Section Name="Garnet">
+    <!-- "Standalone" (single node) or "Cluster" (sharded + replicated). -->
+    <Parameter Name="Mode" Value="Standalone" />
+
+    <!-- Total main-log memory for the Garnet store, e.g. 256m, 1g, 4g. -->
+    <Parameter Name="MemorySize" Value="1g" />
+
+    <!-- Optional start size of the hash index (e.g. 64m). Empty = Garnet default. -->
+    <Parameter Name="IndexSize" Value="" />
+
+    <!-- Enable append-only file. Recommended (true) in Cluster mode for replication. -->
+    <Parameter Name="EnableAof" Value="false" />
+
+    <!-- Start each node with a clean cluster config so the control plane owns topology. -->
+    <Parameter Name="CleanClusterConfig" Value="true" />
+
+    <!-- Optional intra-cluster credentials (must match ClusterManager settings). -->
+    <Parameter Name="ClusterUsername" Value="" />
+    <Parameter Name="ClusterPassword" Value="" />
+
+    <!-- Free-form extra Garnet args, space separated (e.g. "- - minthreads 4"). -->
+    <Parameter Name="ExtraArgs" Value="" />
+  </Section>
+
+</Settings>

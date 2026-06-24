@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Settings xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xmlns="http://schemas.microsoft.com/2011/01/fabric">
+
+  <Section Name="ClusterManager">
+    <!-- "Standalone" => control plane idles. "Cluster" => it forms/heals the cluster. -->
+    <Parameter Name="Mode" Value="Standalone" />
+
+    <!-- Default service name of the Garnet hosting service inside this application. -->
+    <Parameter Name="GarnetServiceName" Value="GarnetService" />
+
+    <!-- Replicas attached to each primary (0 = primaries only / no redundancy). -->
+    <Parameter Name="ReplicaCount" Value="1" />
+
+    <!-- How often (seconds) the control loop reconciles topology. Minimum 5. -->
+    <Parameter Name="ReconcileIntervalSeconds" Value="15" />
+
+    <!-- Consecutive cycles a *suspected* (not yet cluster-agreed) primary must stay
+         unreachable from the control plane before a failover is forced. Minimum 1. -->
+    <Parameter Name="FailoverConfirmations" Value="2" />
+
+    <!-- Minimum seconds between forced failovers of the same primary (promotion settle time). -->
+    <Parameter Name="FailoverCooldownSeconds" Value="30" />
+
+    <!-- Optional intra-cluster credentials (must match the GarnetService settings). -->
+    <Parameter Name="ClusterUsername" Value="" />
+    <Parameter Name="ClusterPassword" Value="" />
+  </Section>
+
+</Settings>

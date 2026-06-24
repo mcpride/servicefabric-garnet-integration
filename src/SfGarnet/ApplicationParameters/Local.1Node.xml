@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Single-node, on-premise Service Fabric (a 1-node dev/OneBox or 1-node standalone cluster).
+  One Garnet node, no sharding/replication, control plane idles.
+-->
+<Application xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Name="fabric:/SfGarnet" xmlns="http://schemas.microsoft.com/2011/01/fabric">
+  <Parameters>
+    <Parameter Name="SfGarnet_Mode" Value="Standalone" />
+    <Parameter Name="GarnetService_InstanceCount" Value="1" />
+    <Parameter Name="GarnetService_MemorySize" Value="1g" />
+    <Parameter Name="GarnetService_EnableAof" Value="false" />
+    <Parameter Name="GarnetService_CleanClusterConfig" Value="true" />
+    <Parameter Name="ClusterManager_ReplicaCount" Value="0" />
+    <Parameter Name="ClusterManager_ReconcileIntervalSeconds" Value="15" />
+  </Parameters>
+</Application>

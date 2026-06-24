@@ -1,0 +1,98 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ApplicationManifest xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ApplicationTypeName="SfGarnetType" ApplicationTypeVersion="1.0.0" xmlns="http://schemas.microsoft.com/2011/01/fabric">
+  <!--
+    "SfGarnet" application: hosts Microsoft Garnet (RESP/Redis-compatible) on Service Fabric.
+
+    A single application type serves BOTH topologies, selected by the SfGarnet_Mode parameter:
+      * Standalone => one Garnet node, ClusterManager idles. Use on a 1-node SF cluster.
+      * Cluster    => one Garnet node per SF node (InstanceCount = -1), ClusterManager
+                      forms and heals a sharded + replicated Garnet cluster.
+  -->
+  <Parameters>
+    <!-- Topology selector applied to both services: "Standalone" or "Cluster". -->
+    <Parameter Name="SfGarnet_Mode" DefaultValue="Standalone" />
+    <!-- Number of Garnet nodes. 1 for Standalone; -1 (one per SF node) for Cluster. -->
+    <Parameter Name="GarnetService_InstanceCount" DefaultValue="1" />
+    <!-- Garnet store main-log memory per node (e.g. 256m, 1g, 4g). -->
+    <Parameter Name="GarnetService_MemorySize" DefaultValue="1g" />
+    <!-- Optional Garnet hash-index start size (e.g. 64m). Empty = Garnet default. -->
+    <Parameter Name="GarnetService_IndexSize" DefaultValue="" />
+    <!-- Append-only file. Keep false for Standalone; set true for Cluster replication. -->
+    <Parameter Name="GarnetService_EnableAof" DefaultValue="false" />
+    <!-- Start nodes with a clean cluster config so the control plane owns topology. -->
+    <Parameter Name="GarnetService_CleanClusterConfig" DefaultValue="true" />
+    <!-- Extra raw Garnet args (space separated), appended verbatim to the command line. -->
+    <Parameter Name="GarnetService_ExtraArgs" DefaultValue="" />
+    <!-- Replicas per primary used by the control plane (0 = primaries only). -->
+    <Parameter Name="ClusterManager_ReplicaCount" DefaultValue="1" />
+    <!-- Control-loop reconcile interval (seconds, minimum 5). -->
+    <Parameter Name="ClusterManager_ReconcileIntervalSeconds" DefaultValue="15" />
+    <!-- Consecutive cycles a suspected (not yet cluster-agreed) primary must stay down before failover. -->
+    <Parameter Name="ClusterManager_FailoverConfirmations" DefaultValue="2" />
+    <!-- Minimum seconds between forced failovers of the same primary. -->
+    <Parameter Name="ClusterManager_FailoverCooldownSeconds" DefaultValue="30" />
+    <!-- Optional intra-cluster credentials shared by both services (may be empty). -->
+    <Parameter Name="SfGarnet_ClusterUsername" DefaultValue="" />
+    <Parameter Name="SfGarnet_ClusterPassword" DefaultValue="" />
+  </Parameters>
+  <!-- ================= GarnetService (the data plane) ================= -->
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="GarnetServicePkg" ServiceManifestVersion="1.0.0" />
+    <ConfigOverrides>
+      <ConfigOverride Name="Config">
+        <Settings>
+          <Section Name="Garnet">
+            <Parameter Name="Mode" Value="[SfGarnet_Mode]" />
+            <Parameter Name="MemorySize" Value="[GarnetService_MemorySize]" />
+            <Parameter Name="IndexSize" Value="[GarnetService_IndexSize]" />
+            <Parameter Name="EnableAof" Value="[GarnetService_EnableAof]" />
+            <Parameter Name="CleanClusterConfig" Value="[GarnetService_CleanClusterConfig]" />
+            <Parameter Name="ClusterUsername" Value="[SfGarnet_ClusterUsername]" />
+            <Parameter Name="ClusterPassword" Value="[SfGarnet_ClusterPassword]" />
+            <Parameter Name="ExtraArgs" Value="[GarnetService_ExtraArgs]" />
+          </Section>
+        </Settings>
+      </ConfigOverride>
+    </ConfigOverrides>
+    <!-- One Garnet process per node, isolated from the control plane. -->
+    <Policies>
+      <ServicePackageResourceGovernancePolicy />
+    </Policies>
+  </ServiceManifestImport>
+  <!-- ================= ClusterManager (the control plane) ================= -->
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="ClusterManagerPkg" ServiceManifestVersion="1.0.0" />
+    <ConfigOverrides>
+      <ConfigOverride Name="Config">
+        <Settings>
+          <Section Name="ClusterManager">
+            <Parameter Name="Mode" Value="[SfGarnet_Mode]" />
+            <Parameter Name="ReplicaCount" Value="[ClusterManager_ReplicaCount]" />
+            <Parameter Name="ReconcileIntervalSeconds" Value="[ClusterManager_ReconcileIntervalSeconds]" />
+            <Parameter Name="FailoverConfirmations" Value="[ClusterManager_FailoverConfirmations]" />
+            <Parameter Name="FailoverCooldownSeconds" Value="[ClusterManager_FailoverCooldownSeconds]" />
+            <Parameter Name="ClusterUsername" Value="[SfGarnet_ClusterUsername]" />
+            <Parameter Name="ClusterPassword" Value="[SfGarnet_ClusterPassword]" />
+          </Section>
+        </Settings>
+      </ConfigOverride>
+    </ConfigOverrides>
+  </ServiceManifestImport>
+  <DefaultServices>
+    <!--
+      GarnetService: one stateless instance per node in Cluster mode (InstanceCount = -1),
+      or exactly one instance in Standalone mode (InstanceCount = 1).
+    -->
+    <Service Name="GarnetService" ServicePackageActivationMode="ExclusiveProcess">
+      <StatelessService ServiceTypeName="GarnetServiceType" InstanceCount="[GarnetService_InstanceCount]">
+        <SingletonPartition />
+      </StatelessService>
+    </Service>
+    <!-- ClusterManager: a single control-plane instance for the whole application. -->
+    <Service Name="ClusterManager" ServicePackageActivationMode="ExclusiveProcess">
+      <StatelessService ServiceTypeName="ClusterManagerType">
+        <SingletonPartition />
+      </StatelessService>
+    </Service>
+  </DefaultServices>
+</ApplicationManifest>

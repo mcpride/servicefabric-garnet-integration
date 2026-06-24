@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>ClusterManager</RootNamespace>
+    <AssemblyName>ClusterManager</AssemblyName>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
+    <IsServiceFabricServiceProject>true</IsServiceFabricServiceProject>
+    <ServerGarbageCollection>false</ServerGarbageCollection>
+    <Authors>McPride </Authors>
+    <Product>SF Garnet</Product>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="7.1.2493" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Expose internal control-plane helpers to the unit-test project. -->
+    <InternalsVisibleTo Include="ClusterManager.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="PackageRoot\**\*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

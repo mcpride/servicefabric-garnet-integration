@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ServiceManifest Name="GarnetServicePkg"
+                 Version="1.0.0"
+                 xmlns="http://schemas.microsoft.com/2011/01/fabric"
+                 xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <ServiceTypes>
+    <!-- UseImplicitHost is NOT set: this is a Reliable Services host, not a guest exe. -->
+    <StatelessServiceType ServiceTypeName="GarnetServiceType" />
+  </ServiceTypes>
+
+  <CodePackage Name="Code" Version="1.0.0">
+    <EntryPoint>
+      <ExeHost>
+        <Program>GarnetService.exe</Program>
+        <WorkingFolder>CodePackage</WorkingFolder>
+      </ExeHost>
+    </EntryPoint>
+  </CodePackage>
+
+  <ConfigPackage Name="Config" Version="1.0.0" />
+
+  <Resources>
+    <Endpoints>
+      <!--
+        GarnetEndpoint      = RESP/Redis port that clients connect to (default 6379).
+        GarnetClusterBusEndpoint = internal gossip/replication bus. Garnet derives the
+        bus port as (announced port + 10000), so it must equal 16379 for port 6379.
+        Both ports are fixed so every node exposes the same well-known address; this
+        assumes one Garnet node per Service Fabric node (see README for local testing).
+      -->
+      <Endpoint Name="GarnetEndpoint" Protocol="tcp" Port="6379" />
+      <Endpoint Name="GarnetClusterBusEndpoint" Protocol="tcp" Port="16379" />
+    </Endpoints>
+  </Resources>
+
+</ServiceManifest>
